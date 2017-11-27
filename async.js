@@ -11,16 +11,16 @@ exports.runParallel = runParallel;
 
 function runParallel(jobs, parallelNum, timeout = 1000) {
     return new Promise((resolve) => {
-        if (jobs.length === 0) {
+        if (jobs.length === 0) { // Проверяю пустой jobs
             resolve([]);
         }
         let result = [];
-        let index = 0;
-        let fullCounter = 0;
+        let index = 0; // Индекс в jobs - для запуска нужного jobs[index]
+        let fullCounter = 0; // Контроль заполнения result
 
         let runTranslate = async function (job) {
-            let endOfTime = function () {
-                fullCounter += 1;
+            let endOfTime = function () { // Функция вызова следующего промиса и контроля
+                fullCounter += 1;           // выполнения всех
                 if (index < jobs.length) {
                     runTranslate(jobs[index]);
                 }
@@ -30,9 +30,9 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
             };
 
             try {
-                index += 1;
-                let a = await job();
-                result[jobs.indexOf(job)] = a;
+                index += 1; // Сдвигаю индекс вызываемого следующим при запуске нового промиса
+                let a = await job(); // Жду ответа
+                result[jobs.indexOf(job)] = a; // Под нужным индексом(порядок в jobs) записываю
                 endOfTime();
             } catch (err) {
                 result[jobs.indexOf(job)] = err;
@@ -40,6 +40,6 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
             }
         };
 
-        jobs.slice(0, parallelNum).forEach(job => runTranslate(job));
+        jobs.slice(0, parallelNum).forEach(job => runTranslate(job)); // Делаю "параллел. потоки"
     });
 }
