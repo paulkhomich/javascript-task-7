@@ -11,7 +11,7 @@ exports.runParallel = runParallel;
 
 function runParallel(jobs, parallelNum, timeout = 1000) {
     return new Promise((resolve) => {
-        if (jobs.title === 0) {
+        if (jobs.length === 0) {
             resolve([]);
         }
         let result = [];
