@@ -1,6 +1,6 @@
 'use strict';
 
-exports.isStar = false;
+exports.isStar = true;
 exports.runParallel = runParallel;
 
 /** Функция паралелльно запускает указанное число промисов
@@ -29,13 +29,19 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
                 }
             };
 
+            let timer = setTimeout(function () { // Запускаем счетчик допустимого времени
+                throw new Error('Promise timeout');
+            }, timeout);
+
             try {
                 index += 1; // Сдвигаю индекс вызываемого следующим при запуске нового промиса
                 let a = await job(); // Жду ответа
+                clearTimeout(timer); // Сбрасываем таймер, тк все хорошо
                 result[jobs.indexOf(job)] = a; // Под нужным индексом(порядок в jobs) записываю
                 endOfTime();
             } catch (err) {
                 result[jobs.indexOf(job)] = err;
+                clearTimeout(timer); // Сбрасываем таймер, тк уже все плохо
                 endOfTime();
             }
         };
